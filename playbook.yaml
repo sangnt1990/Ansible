@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+#  Change banner login "VNPAYCLOUD" from motd file
+    - name: Change_Banner_Login
+      copy:
+        src: motd
+        dest: /etc
