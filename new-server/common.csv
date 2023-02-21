@@ -1,0 +1,358 @@
+#
+# GENERAL
+#
+release_version,7.4.2
+cloudian_license_file_name,cloudian-Object-Lock-Compatible-CSC.lic
+default_region,hcm
+regions,"hcm"
+javahome,/usr/lib/jvm/java-11-openjdk-11.0.12.0.7-0.el7_9.x86_64/
+java_minimum_stack_size,256k
+installation_root_directory,/opt/cloudian-packages
+run_root_directory,/opt
+pid_root_directory,/var/run
+cloudian_user,"cloudian,cloudian,,/bin/bash"
+cloudian_runuser,cloudian
+user_bin_directory,/usr/local/bin
+user_home_directory,/export/home
+cloudian_userid_length,64
+
+service_starts_on_boot,true
+# cloudian_log_directory,/var/log/cloudian
+cloudian_log_directory,/var/log/cloudian
+cleanup_directories_byage_withmatch,"/var/log/cloudian,/tmp,/var/log/puppetserver,/opt/tomcat/logs"
+cleanup_directories_byage_withmatch_timelimit,15d
+cleanup_directories_byage_matches,"diagnostics*.gz,diagnostics*.tgz,hiq_metrics*.gz,jna*.tmp,liblz4-java*.so,snappy-*.so,*.cloudian-bak,cloudian_system_info*.tar.gz,puppetserver*.log.zip,localhost*.log,localhost_access_log*.txt,catalina*.log"
+cleanup_sysinfo_logs_timelimit,15d
+
+
+path_style_access,true
+fips_enabled,false
+sshdconfig_disable_override,false
+
+#
+# HYPERSTORE SERVICE
+#
+hyperstore_data_directory,"/cloudian1"
+# Format options for hyperstore_listen_ip_choices,%{::cloudian_ipaddress},%{::ipaddress_eth#},%{::ipaddress_lo},%{::ipaddress_bind#}
+hyperstore_listen_ip,%{::cloudian_ipaddress}
+hyperstore_timeout,10000
+hyperstore_connection_timeout,10000
+hyperstore.maxthreads.repair,50
+hyperstore_jetty_minThreads,100
+auto_repair_computedigest_run_number,0
+# NOTE: The following settings are calculated by cfg_node.py
+hyperstore.maxthreads.write,50
+hyperstore.maxthreads.read,50
+hyperstore_maxperrouteconnections,50
+hyperstore_maxtotalconnections,500
+hyperstore_jetty_maxThreads,500
+hyperstore_messaging_service_threadpool,200
+hyperstore_repair_session_threadpool,50
+hyperstore_repair_digest_index_threadpool,20
+hyperstore_rangerepair_threadpool,4
+hyperstore_stream_outbound_threadpool,25
+hyperstore_downloadrange_session_threadpool,10
+hyperstore_uploadrange_session_threadpool,25
+hyperstore_decommission_threadpool,8
+hyperstore_cleanup_session_threadpool,4
+hyperstore_auto_repair_threadpool,2
+hyperstore_repairec_sessionscan_threadpool,50
+hyperstore_repairec_digestrequest_threadpool,30
+hyperstore_repairec_task_threadpool,60
+hyperstore_repairec_rocksdbscan_threadpool,30
+hyperstore_disk_check_interval,4320
+
+#
+# S3/ADMIN SERVICES
+
+# moved from harded coded in mts.properties.erb
+phonehome_proxy_host,
+phonehome_proxy_port,
+phonehome_proxy_username,
+phonehome_proxy_password,
+phonehome_uri,https://s3-support.cloudian.com:443
+phonehome_bucket,
+phonehome_access_key,
+phonehome_secret_key,
+phonehome_gdpr,false
+phonehome_gdpr_bucket,false
+
+
+# Admin Security configurations
+admin_auth_user,sysadmin
+admin_auth_pass,"1nea1g8u1fof1lps1n4n1mis1m601rvx1qhs1s4a1r2r1eos1ytc1kza1kzs1yta1en61r571s2s1qji1rwx1m6e1mm21n6v1lu61fmn1g8w1nbg,pDS+B7PYOpJOtLUs2vUnkWrjz3E="
+admin_auth_realm,CloudianAdmin
+admin_auth_enabled,true
+admin_secure,true
+cmc_admin_secure_port,19443
+
+# Password requirements
+user_password_min_length,9
+user_password_dup_char_ratio_limit,-1
+user_password_unique_generations,0
+user_password_rotation_graceperiod,0
+user_password_rotation_expiration,0
+
+user_password_lock_enabled,true
+user_password_lock_durationsec,1800
+user_password_lock_maxfailedattempts,6
+
+# IAM configuration
+iam_service_enabled,true
+iam_port,16080
+iam_secure,false
+iam_secure_port,16443
+iam_service_endpoint,iam.sds.infiniband.vn
+
+iam_max_groups,300
+iam_max_groups_per_user,10
+
+# admin.xml threadpool configurations
+cloudian_s3admin_min_threads,10
+cloudian_s3admin_max_threads,50
+cloudian_s3admin_max_idletime,60000
+cloudian_s3admin_lowres_maxidletime,5000
+cloudian_s3admin_lowres_maxconnections,1000
+
+# s3.xml threadpool configurations
+# NOTE: cloudian_s3_max_threads setting is calculated by cfg_node.py
+cloudian_s3_max_threads,500
+cloudian_s3_max_idletime,60000
+cloudian_s3_lowres_maxidletime,5000
+cloudian_s3_lowres_maxconnections,2000
+cloudian_tiering_useragent,"APN/1.0 Cloudian/1.0 HyperStore/"
+s3_proxy_protocol_enabled,false
+
+# Settings passed to java using -Xmx option. Use percentage of system total RAM but no more than limit.
+cloudian_s3_heap_limit,30g
+cloudian_s3_max_heap_percent,15
+cloudian_hss_heap_limit,30g
+cloudian_hss_max_heap_percent,15
+cloudian_admin_heap_limit,16g
+cloudian_admin_max_heap_percent,5
+
+# Settings passed to java using -Xms option as a percentage of -Xmx value.
+cloudian_s3_init_heap_percent,25
+cloudian_hss_init_heap_percent,25
+cloudian_admin_init_heap_percent,25
+
+# Settings passed to java using -Xmn option as a percentage of -Xmx value.
+cloudian_s3_new_heap_percent,25
+cloudian_hss_new_heap_percent,25
+cloudian_admin_new_heap_percent,25
+
+# auto-heap dump, for both S3 and HS
+cloudian_heapdump_on_out_of_memory,true
+
+# Ignore internal networks in bucket logging
+s3_bucket_logging_internalnetworks,""
+
+# Max number of Cassandra nodes an S3 server connects to.
+cassandras_per_s3node,9
+# NOTE: cassandra_max_active setting is calculated by cfg_node.py
+cassandra_max_active,30
+
+# AES-256 encryption
+cloudian_s3_aes256encryption_enabled,false
+
+cloudian_s3_autoinvalidateiamcache,true
+
+# Per Bucket QoS Counters
+s3_perbucket_qos_enabled,false
+
+# REDIS
+#
+redis_credentials_master_port,6379
+redis_monitor_subscription_check,false
+
+# redis QOS master host is set in regions.csv
+redis_qos_master_port,6380
+redis_monitor_listener_port,9078
+redis_lib_directory,/var/lib/redis
+redis_log_directory,/var/log/redis
+
+#
+# CASSANDRA
+#
+
+# Values are auto-generated based on node's RAM.  This overrides that automatic setting.  Both need to be set.
+#cassandra_max_heap_size,12g
+cassandra_enable_gc_logging,true
+cassandra_heapdump_on_out_of_memory,true
+cassandra_lib_directory,/var/lib/cassandra
+cassandra_log_directory,/var/log/cassandra
+cassandra_saved_cache_directory,/var/lib/cassandra
+cassandra_commit_log_directory,/var/lib/cassandra_commit
+cassandra_data_directory,/var/lib/cassandra/data
+cassandra_port,9160
+concurrent_compactors,2
+cassandra_tombstone_warn_threshold,50000
+cassandra_tombstone_failure_threshold,100000
+cassandra_tombstone_cleanup_threshold,75000
+cassandra_tombstone_gcgrace,0
+# Format of listen_address_choices,%{::cloudian_ipaddress},%{::ipaddress_eth#},%{::ipaddress_lo},%{::ipaddress_bind#}
+cassandra_listen_address,%{::cloudian_ipaddress}
+# Format of rpc_address_choices,%{::cloudian_ipaddress},%{::ipaddress_eth#},%{::ipaddress_lo},%{::ipaddress_bind#}
+cassandra_rpc_address,%{::cloudian_ipaddress}
+# The default node location string in cassandra-topology.properties.
+# cassandra_default_node_datacenter,DC1:RAC1
+
+
+#
+# CMC
+#
+
+# Whitelist
+admin_whitelist_enabled,true
+
+allow_delete_users_with_buckets,false
+
+cmc_log_directory,/var/log/cloudian
+# admin_host_ip: IP address of load balancer to admin servers or the IP address of an admin server.
+cmc_admin_host_ip,s3-admin.infiniband.vn
+cmc_cloudian_admin_user,admin
+cmc_domain,sb-cmc-sds.infiniband.vn
+cmc_web_secure,true
+cmc_http_port,8888
+cmc_https_port,8443
+cmc_admin_secure_ssl,false
+cmc_application_name,Cloudian
+cmc_storageuri_ssl_enabled,false
+cmc_grouplist_enabled,true
+cmc_login_languageselection_enabled,true
+cmc_login_grouplist_enabled,true
+cmc_login_grouplist_admincheckbox_enabled,true
+cmc_grouplist_size_max,100
+cmc_session_timeout,30
+cmc_view_user_data,false
+cmc_crr_external_enabled,false
+cmc_login_banner_size,1
+cmc_login_banner_title,""
+cmc_login_banner_message,""
+cmc_login_banner_button_confirm,""
+cmc_csrf_origin_check_enabled,false
+cmc_csrf_origin_allowlist,""
+
+cmc_sso_enabled,true
+# NOTE: For security, you should change/customize cmc_sso_shared_key and cmc_sso_cookie_cipher_key if you enable SSO.
+cmc_sso_shared_key,weryghf8363
+cmc_sso_cookie_cipher_key,84249248274209294275274
+
+# Bucket Tiering
+# default tiering destination setting in pattern: <destination name>,<Endpoint>,<protocol>
+# supported protocol: s3, glacier, azure, and spectra
+# default value in double quotes: AWS S3,https://s3.amazonaws.com,s3|AWS GLACIER,https://s3.amazonaws.com,glacier|Google,https://storage.googleapis.com,s3|Azure,https://blob.core.windows.net,azure
+cmc_bucket_tiering_default_destination_list,"AWS S3,https://s3.amazonaws.com,s3|AWS GLACIER,https://s3.amazonaws.com,glacier|Google,https://storage.googleapis.com,s3|Azure,https://blob.core.windows.net,azure"
+
+
+#AWS MMS Proxy
+awsmmsproxy_host,
+
+# USAGE
+bucketstats_enabled,false
+
+# ELASTICSEARCH
+cloudian_elasticsearch_hosts,
+
+# SQS
+sqs_enabled,false
+sqs_port,18090
+sqs_endpoint,s3-sqs.mycloudianhyperstore.com
+
+
+# -------------------------------------------------------------------------------------
+# WARNING: Settings below this point should not be manually edited.  These settings
+# are automatically configured by the installer. Any changes made to the below settings
+# may be overwritten by the installer.
+# -------------------------------------------------------------------------------------
+
+#
+# COMPONENTS TO INSTALL
+#       install_redis_credentials_slave
+#       install_redis_credentials_master
+#       install_redis_qos_master
+#       install_redis_qos_slave
+#       install_cloudian_s3
+#       install_cloudian_s3_cronjob
+#       install_cloudian_s3_cronjobbackup
+#       install_cloudian_configmgr
+#       install_cloudian_configmgr_backup
+#       install_cmc
+#       install_cassandra
+#       install_dnsmasq
+#       admin_service_enabled
+#       audit_logging_enabled
+#       primary_redismon_role
+#       backup_redismon_role
+#
+install_cloudian_s3,true
+install_cassandra,true
+install_cmc,true
+install_redis_credentials_slave,false
+install_redis_qos_slave,false
+install_redis_credentials_master,false
+install_redis_qos_master,false
+install_cloudian_s3_cronjob,false
+install_cloudian_s3_cronjobbackup,false
+install_cloudian_configmgr,false
+install_cloudian_configmgr_backup,false
+install_dnsmasq,false
+admin_service_enabled,true
+audit_logging_enabled,false
+primary_redismon_role,false
+backup_redismon_role,false
+
+# CRON - originally hardcoded in watchcronhost.erb
+watchcronhost_minutes_before_failover,10
+
+#
+# DNSMASQ
+#
+dnsmasq_network_interface,eth0
+dnsmasq_cmc_domain_ip,%{::cloudian_ipaddress}
+
+#
+# S3/ADMIN SERVICES
+#
+# Load-balancer port to which CMC points to for S3 service.
+ld_cloudian_s3_port,80
+ld_cloudian_s3_ssl_port,443
+cloudian_s3_admin_port,18081
+
+# Load-balancer port to which CMC points to for S3 Admin service.
+ld_cloudian_s3_admin_port,18081
+cloudian_s3_port,80
+cloudian_s3_ssl_port,443
+
+# CASSANDRA
+# The following is an internal attribute used by the installer to set number of tokens in Cassandra.
+# It should not be modified manually.
+cassandra_num_tokens,0
+
+# REDIS
+redis_credentials_master_host,sb-hyperstore-node-01
+redis_credentials_cluster_hosts,"sb-hyperstore-node-01:6379"
+
+# END
+local_install_ssh_key,/opt/cloudian-staging/7.4.2/./cloudian-installation-key
+local_install_ssh_pubkey,/opt/cloudian-staging/7.4.2/./cloudian-installation-key.pub
+tiering_regions_s3_domains,"s3-hcm.sds.infiniband.vn"
+cloudian_configmgr_backup,
+install_puppet_config_root,/etc/cloudian-7.4.2-puppet
+install_cloudian_config_root,/etc/cloudian
+install_puppetserver_confdir,/etc/puppetserver
+install_salt_config_root,/opt/cloudian-salt/7.4.2
+cloudian_default_internal_interface,ens192
+install_staging_directory,/opt/cloudian-staging/7.4.2
+install_working_directory,/opt/cloudian-staging/7.4.2/.
+cmc_keystore_file,cmc.p12
+cmc_keystore_passwd,
+disk_write_threadpool_corepoolsize,5
+repair_session_threadpool_corepoolsize,10
+repair_digest_index_threadpool_corepoolsize,20
+rangerepair_threadpool_corepoolsize,4
+stream_outbound_threadpool_corepoolsize,25
+downloadrange_session_threadpool_corepoolsize,10
+uploadrange_session_threadpool_corepoolsize,25
+decommission_threadpool_corepoolsize,8
+auto_repair_threadpool_corepoolsize,2

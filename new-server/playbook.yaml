@@ -1,0 +1,206 @@
+---
+
+
+- hosts: all
+  become: true
+  become_method: sudo
+
+  tasks:
+
+#  Change banner login "VNPAYCLOUD" from motd file
+
+    - name: Change Banner Login
+      copy:
+        src: motd
+        dest: /etc
+
+#  Change hostname from etc/ansible/hosts
+
+    - name: Set hostname
+      hostname:
+        name="{{ inventory_hostname }}"
+
+# # Manager package software
+    - name: Manager package software
+  
+      command: "dpkg --configure -a"
+
+# Set Time syschronize
+
+    - name: Install chrony
+      apt:
+        name: chrony
+        state: latest
+        update_cache: yes
+
+    - name: deploy chrony.conf template
+      template:
+        src: chrony.conf
+        dest: /etc/chrony/chrony.conf
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+
+    - name: Restart chronyd
+      service:
+        name: chronyd
+        state: restarted
+
+# Add host gitlab, jump to etc/hosts
+
+    - name: Update /etc/hosts
+      become: true
+      blockinfile:
+        path: /etc/hosts
+        create: yes
+        block: |
+            10.2.12.15 gitlab.vnpaycloud.vn
+            172.26.13.13 jump.infiniband.vn
+
+# Clone new-server-scripts from Git
+
+    - name: Clone a gitlab repository
+      git:
+        repo: https://gitlab.vnpaycloud.vn/vnpay-cloud/new-server-scripts.git 
+        dest: $HOME/new-server-scripts
+        clone: yes
+        update: yes
+
+# Setup teleport
+    - name: unarchive teleport
+      unarchive:
+        src: "$HOME/new-server-scripts/teleport-v10.0.2-linux-amd64-bin.tar.gz"
+        dest: "$HOME/new-server-scripts/"
+        remote_src: true
+        
+    - name: run install teleport
+      shell: 
+        "$HOME/new-server-scripts/teleport/install"
+
+
+    - name: copy file teleport-node.sh to remote
+      become: true
+      copy:
+        src: teleport-node.sh
+        dest: $HOME/new-server-scripts/
+
+    - name: Get token
+      shell: curl -o $HOME/node-token.txt https://jump.infiniband.vn:8443/node_token/ -k
+
+    - name: Cut token
+      command: cut -c 30-61 $HOME/node-token.txt
+      register: token
+    - debug: msg="{{token.stdout}}"
+
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: "$HOME/new-server-scripts/teleport-node.sh"
+        mode: 'a+x'
+
+    - name: setup teleport
+      shell: 
+          "$HOME/new-server-scripts/teleport-node.sh {{ inventory_hostname }}.infiniband.vn {{ token.stdout }}"
+      register: teleport
+    - debug: msg="{{teleport.stdout.split("\n")}}"
+
+# Configure password policy
+
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: $HOME/new-server-scripts/ubuntu-password-policy.sh
+        mode: 'a+x'
+
+    - name: configure password policy
+      shell: 
+          "$HOME/new-server-scripts/ubuntu-password-policy.sh"
+      register: password
+    - debug: msg="{{password.stdout.split("\n")}}"
+
+# Configure Antivirus
+
+    - name: copy file ubuntu-clamav.sh to remote
+      become: true
+      copy:
+        src: ubuntu-clamav.sh
+        dest: $HOME/new-server-scripts/
+    
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: "$HOME/new-server-scripts/ubuntu-clamav.sh"
+        mode: 'a+x'
+
+    - name: setup clamav
+      shell: 
+          " $HOME/new-server-scripts/ubuntu-clamav.sh "
+      register: clamav
+    - debug: msg="{{clamav.stdout.split("\n")}}"
+
+# Setup Prometheus Node Exporter
+
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: "$HOME/new-server-scripts/ubuntu-node-exporter.sh"
+        mode: 'a+x'
+
+    - name: setup node-exporter
+      shell: 
+          " $HOME/new-server-scripts/ubuntu-node-exporter.sh "
+      register: exporter
+    - debug: msg="{{exporter.stdout.split("\n")}}"
+
+# Setup remote Syslog Filebeat
+
+    - name: copy file filebeat.sh to remote
+      become: true
+      copy:
+        src: filebeat.sh
+        dest: $HOME/new-server-scripts/
+    
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: "$HOME/new-server-scripts/filebeat.sh"
+        mode: 'a+x'
+
+    - name: setup remote syslog filebeat
+      shell: 
+          " $HOME/new-server-scripts/filebeat.sh "
+      register: filebeat
+    - debug: msg="{{filebeat.stdout.split("\n")}}"
+
+# Setup wazuh agent
+
+    - name: copy file wazuh.sh to remote
+      become: true
+      copy:
+        src: ubuntu-wazuh-agent.sh
+        dest: $HOME/new-server-scripts/
+    
+    - name: set execution permission
+      ansible.builtin.file:
+        dest: "$HOME/new-server-scripts/ubuntu-wazuh-agent.sh"
+        mode: 'a+x'
+
+    - name: setup remote syslog wazuh
+      shell: 
+          " $HOME/new-server-scripts/ubuntu-wazuh-agent.sh "
+      register: wazuh
+    - debug: msg="{{wazuh.stdout.split("\n")}}"
+
+# Delete directory 
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: $HOME/new-server-scripts
+
+
+
+
+
+
+
+
+
+
+
+
